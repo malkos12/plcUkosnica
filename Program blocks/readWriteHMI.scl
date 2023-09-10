@@ -1,0 +1,23 @@
+﻿FUNCTION "readWriteHMI" : Void
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+   VAR_INPUT 
+      inIntValue1 : Int;
+      inDintValue2 : DInt;
+      inDintValue3 : DInt;
+   END_VAR
+
+   VAR_OUTPUT 
+      outIntValue1 : Int;
+      outDintValue2 : DInt;
+      outDintValue3 : DInt;
+   END_VAR
+
+
+BEGIN
+	#outIntValue1 := #inIntValue1;
+	#outDintValue2 := #inDintValue2;
+	#outDintValue3 := #inDintValue3;
+	
+END_FUNCTION
+

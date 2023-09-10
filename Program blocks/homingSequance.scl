@@ -1,0 +1,43 @@
+﻿FUNCTION "homingSequance" : Void
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+   VAR_INPUT 
+      hmiBaseButton : Bool;
+      homeSensor : Bool;
+      positiveEdgeHomeSensor : Bool;
+      negativeEdgeHomeSensor : Bool;
+      stopSeq : Bool;
+   END_VAR
+
+   VAR_IN_OUT 
+      machinePosition : DInt;
+      encoderTurn : DInt;
+      homingSeqNum : Int;
+   END_VAR
+
+
+BEGIN
+	IF (#hmiBaseButton = TRUE & #homingSeqNum=0 & #homeSensor=true) THEN
+	    #homingSeqNum := 1; //start bazowania
+	ELSIF (#homingSeqNum = 1 & #negativeEdgeHomeSensor = TRUE) THEN
+	    #homingSeqNum := 2; //wykrycie czujnika home i zatrzymanie
+	ELSIF (#homingSeqNum = 2 & #positiveEdgeHomeSensor = TRUE) THEN
+	    #homingSeqNum := 3; // zjazd z czujnika
+	ELSIF (#homingSeqNum = 3) THEN
+	    #homingSeqNum := 4;//ponowny dojazd
+	ELSIF (#homingSeqNum = 4 & #negativeEdgeHomeSensor = TRUE) THEN
+	    #homingSeqNum := 5;//zatrzymanie
+	    
+	ELSIF #homingSeqNum = 5 THEN
+	    #homingSeqNum := 0;
+	   // #machinePosition := 0;
+	  //  #encoderTurn := 0; //na czas testów wykomentowano
+	END_IF;
+	IF (#stopSeq = true) THEN
+	    #homingSeqNum := 0;
+	END_IF;
+	
+	    
+	
+END_FUNCTION
+

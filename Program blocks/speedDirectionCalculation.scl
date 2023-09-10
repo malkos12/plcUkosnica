@@ -1,0 +1,85 @@
+﻿FUNCTION_BLOCK "speedDirectionCalculation"
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+   VAR_INPUT 
+      setpointSource : Bool;   // set in HMI, 0-user setpoint in st, 1-serwis setpoint in machine position value
+      setpoint : Int;   // setpoint in st
+      serwisSetpoint : DInt;
+      machineConst : Real;
+      machinePosition : DInt;
+      machineSpeed : Int;
+      manualSpeed : Int;
+      baseSpeed : Int;
+      homingSeq : Int;
+      goToSetpoint : Bool;
+      jog : Bool;
+   END_VAR
+
+   VAR_OUTPUT 
+      stepperMotorDirection : Bool;
+      inRequestPosition : Bool;
+      speedForStepperMotor : Real;
+      reqPositionValue : DInt := 0;
+   END_VAR
+
+   VAR 
+      reqPosition : Real;
+   END_VAR
+
+   VAR_TEMP 
+      diff : DInt;
+      distanceToDrive : DInt;
+   END_VAR
+
+
+BEGIN
+	#reqPositionValue := 0;
+	IF #setpointSource = TRUE THEN
+	    #reqPositionValue := #serwisSetpoint;
+	ELSE
+	    #reqPosition := (INT_TO_REAL(#setpoint) + 450.0) / 900.0 * #machineConst;
+	    #reqPositionValue := REAL_TO_DINT(#reqPosition);
+	END_IF;
+	
+	#inRequestPosition := false;
+	
+	IF #reqPositionValue<#machinePosition THEN
+	    #stepperMotorDirection := false;
+	   // Statement section IF
+	ELSIF (#reqPositionValue>#machinePosition) THEN
+	    #stepperMotorDirection := true;
+	ELSE
+	    #inRequestPosition := true;
+	END_IF;
+	
+	//speed calculation
+	//
+	IF (#goToSetpoint = 1) THEN
+	    #speedForStepperMotor := INT_TO_REAL(#machineSpeed) / 50;
+	    #diff := ABS(#reqPositionValue - #machinePosition);
+	    
+	    IF (#diff < 100) THEN
+	        #speedForStepperMotor := INT_TO_REAL(#machineSpeed) / 400;
+	        IF (#diff < 10) THEN
+	            #speedForStepperMotor := INT_TO_REAL(#machineSpeed) / 1200;
+	        END_IF;
+	    END_IF;
+	ELSIF #jog = 1 THEN
+	    #speedForStepperMotor := INT_TO_REAL(#manualSpeed) / 100;
+	ELSIF #homingSeq = 1 THEN
+	    #speedForStepperMotor := INT_TO_REAL(#baseSpeed) / 100; //predkość szybka powrotu
+	ELSIF #homingSeq =2 THEN
+	    #speedForStepperMotor := INT_TO_REAL(#baseSpeed) / 200; //predkość odjazdu
+	ELSIF #homingSeq =4 THEN
+	    #speedForStepperMotor := INT_TO_REAL(#baseSpeed) / 800;
+	    
+	ELSE
+	    #speedForStepperMotor := 0.1;
+	END_IF;
+	    
+	    
+	    
+	    
+	
+END_FUNCTION_BLOCK
+

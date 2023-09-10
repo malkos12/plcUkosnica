@@ -1,0 +1,38 @@
+﻿FUNCTION "checkPositionAfterRebbot" : Void
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+   VAR_INPUT 
+      actualPosition : DInt;
+      lastPosition : DInt;
+      lastMachinePosition : DInt;
+   END_VAR
+
+   VAR_OUTPUT 
+      baseReq : Bool;
+   END_VAR
+
+   VAR_IN_OUT 
+      machinePosition : DInt;
+   END_VAR
+
+   VAR_TEMP 
+      lowPositionLimit : DInt;
+      highPositionLimit : DInt;
+   END_VAR
+
+
+BEGIN
+	    #lowPositionLimit := #lastPosition - 1;
+	    #highPositionLimit := #lastPosition + 1;
+	    IF (#actualPosition>=#lowPositionLimit & #actualPosition<#highPositionLimit) THEN
+	        #baseReq := 0;
+	        #machinePosition := #lastMachinePosition;
+	    ELSE
+	        #baseReq := 1;
+	        ;
+	    END_IF;
+	    
+	
+	
+END_FUNCTION
+
