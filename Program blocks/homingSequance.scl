@@ -30,8 +30,8 @@ BEGIN
 	    
 	ELSIF #homingSeqNum = 5 THEN
 	    #homingSeqNum := 0;
-	   // #machinePosition := 0;
-	  //  #encoderTurn := 0; //na czas testów wykomentowano
+	    #machinePosition := 0;
+	    #encoderTurn := 0; //na czas testów wykomentowano
 	END_IF;
 	IF (#stopSeq = true) THEN
 	    #homingSeqNum := 0;
